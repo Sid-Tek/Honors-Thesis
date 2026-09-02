@@ -1,0 +1,10 @@
+--- 2. Distance check (mean same-author vs. different-author) ---
+Same-author pairs:         99   mean distance: 5.172
+Different-author pairs:  4851   mean distance: 5.570
+Ratio (different / same): 1.08  (same-author novels ARE closer on average -- good sign)
+
+--- 3. Nearest-neighbor test (the real test) ---
+Nearest neighbor matched the same author: 5/100 = 5.0%
+Naive chance level given your author group sizes: 2.0%
+Permutation test p-value: 0.090  (probability of matching this well under random author labels)
+-> NOT statistically significant at this sample size -- the result could plausibly be chance. More novels per author would make this test more trustworthy.

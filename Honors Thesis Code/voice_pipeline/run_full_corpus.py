@@ -71,7 +71,14 @@ def book_local_windows(filename):
 
 
 def average_profiles(profiles):
-    return {f: float(np.mean([p[f] for p in profiles])) for f in FEATURE_NAMES}
+    # nanmean, not mean: for a floored feature (see scoring.MIN_RAW_COUNT),
+    # most authors' own_profile[f] will legitimately be NaN (e.g. the ~27
+    # authors who never use a dash at all). A plain mean would let those
+    # NaNs poison the whole background average to NaN, silently erasing
+    # every subject's result for that feature even when the subject AND a
+    # handful of other authors have perfectly good data. nanmean instead
+    # averages over whichever authors do have a trustworthy value.
+    return {f: float(np.nanmean([p[f] for p in profiles])) for f in FEATURE_NAMES}
 
 
 def main():

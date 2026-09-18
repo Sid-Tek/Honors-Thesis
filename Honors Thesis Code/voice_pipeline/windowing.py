@@ -14,6 +14,18 @@ from typing import List
 SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
 WORD_RE = re.compile(r"[A-Za-z']+")
 
+# A hyphen standing ALONE (whitespace or a string edge on both sides), e.g.
+# "Well - I don't know" or "he stopped -". Counted as a dash because most
+# authors' source files in this corpus write their dashes this way instead
+# of with "--" / em / en dashes (a diagnosis on Sep 13 found 27 of 33 authors
+# with zero true dash characters, including Dickens, Hardy, Woolf). Hyphens
+# INSIDE words ("to-day", "mother-in-law") never match, since they have a
+# non-space character on at least one side. Known limit: a dash written glued
+# to both neighbours ("Well-I don't know") is indistinguishable from a
+# compound and is not counted, so dash_rate is a lower bound for any author
+# whose source flattened dashes that way.
+STANDALONE_HYPHEN_RE = re.compile(r'(?<!\S)-(?!\S)')
+
 
 @dataclass
 class Sentence:
@@ -35,6 +47,12 @@ def load_text(path: str) -> str:
     return text
 
 
+def count_dashes(raw: str) -> int:
+    """True dash characters (-- , em dash, en dash) plus standalone hyphens."""
+    return (raw.count('--') + raw.count('—') + raw.count('–')
+            + len(STANDALONE_HYPHEN_RE.findall(raw)))
+
+
 def parse_sentences(text: str) -> List[Sentence]:
     raw_sentences = SENTENCE_SPLIT_RE.split(text)
     sentences = []
@@ -51,7 +69,7 @@ def parse_sentences(text: str) -> List[Sentence]:
             n_words=len(words),
             commas=raw.count(','),
             semicolons=raw.count(';'),
-            dashes=raw.count('--') + raw.count('—') + raw.count('–'),
+            dashes=count_dashes(raw),
             terminal=terminal,
             raw=raw,
         ))

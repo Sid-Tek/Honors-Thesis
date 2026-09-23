@@ -1,0 +1,4 @@
+L_windows,approx_words,n_tests,n_sig_block,n_authors_block,n_sig_perm,n_sig_first_third,n_sig_middle_third,n_sig_last_third,sig_block_list
+2,600,780,0,0,0,0,0,0,
+5,1500,780,0,0,75,0,0,0,
+10,3000,780,0,0,81,0,0,0,

@@ -1,0 +1,9 @@
+1. Opening test, single-window null, on position-free curves: % with p < .05 (target 5%)
+     300 words: 4.1%
+     600 words: 6.0%
+     900 words: 6.9%
+    1500 words: 7.9%
+    2400 words: 7.8%
+    3900 words: 6.4%
+2. Rank-test placebo (mid-book stretch): mean p = 0.492, p < .05 in 5.9% of curves (target 0.5 / 5%)
+3. Accumulators at q < .05: single-window null 107, 5-window chunk null 75, significant under both 75

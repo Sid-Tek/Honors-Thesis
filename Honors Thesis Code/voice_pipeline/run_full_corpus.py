@@ -18,10 +18,13 @@ Design:
     a SUBJECT -- there's no held-out test material to run their own
     emergence curves on without reusing the same text that built their
     profile.
-  - FDR correction is applied ONCE across the WHOLE study (all authors x
-    all features), not per-author -- this is stricter than the two-author
-    pilot's per-author correction, appropriately so: we're now running many
-    more tests and need to control the study-wide false discovery rate.
+  - FDR correction is study-wide (all authors x all features), not
+    per-author, applied separately to the burst family and the accumulator
+    family (each 33 x 24 tests).
+  - Permutation nulls use the chunk shuffle (stats_tests.DEFAULT_NULL,
+    Sep 23): 5-window pieces shuffled intact, because neighbouring windows
+    are autocorrelated. Under this null no single author x feature burst can
+    clear study-wide FDR (p floor ~5/n windows) -- see stats_tests.py.
 
 Output: output_full/author_feature_results.csv (every author x feature row),
 output_full/feature_summary.md + .csv (aggregated across authors -- this is
@@ -42,7 +45,10 @@ import matplotlib.pyplot as plt
 from windowing import load_text, parse_sentences, local_windows
 from features import extract_features, extract_features_cumulative, FEATURE_NAMES
 from scoring import corpus_stats, author_profile, distinctiveness_scores
-from stats_tests import burst_test, accumulator_test, bh_fdr
+from stats_tests import burst_test, accumulator_test, bh_fdr, DEFAULT_NULL, CHUNK_SIZE
+
+NULL_DESC = (f'chunk shuffle ({CHUNK_SIZE}-window pieces kept intact)' if DEFAULT_NULL == 'chunk'
+             else 'single-window shuffle')
 from synthesis import plot_feature_curve
 
 CORPUS_DIR = 'real_corpus'
@@ -254,8 +260,9 @@ def main():
     with open(os.path.join(OUT_DIR, 'feature_summary.md'), 'w') as f:
         f.write(f"# Corpus-wide feature summary ({n_subjects} authors, {len(by_author)} total incl. background-only)\n\n")
         f.write("Each author compared against a background = average of every OTHER author's own "
-                "profile (not a matched pair, not raw pooled text). FDR correction applied once "
-                f"across the whole study ({n_subjects} authors x {len(FEATURE_NAMES)} features x 2 tests), "
+                "profile (not a matched pair, not raw pooled text). Permutation null: "
+                f"{NULL_DESC}. BH-FDR is study-wide, applied separately to the burst and "
+                f"accumulator families ({n_subjects} authors x {len(FEATURE_NAMES)} features each), "
                 "not per-author.\n\n")
         if excluded:
             f.write(f"Excluded as subjects (only 1 book available): {excluded}\n\n")

@@ -1,0 +1,34 @@
+author,book_A,book_B,n_features_tested,n_bursts_A,n_bursts_B,n_shared,expected_shared_by_chance,p_overlap,jaccard,shared,only_A,only_B
+Woolf,Lighthouse (1927),Years (1937),23,4,6,2,1.04,0.2704686617730096,0.25,"avg_word_len, pct_monosyllabic","hapax_rate, ttr","fw_in, fw_of, semicolon_rate, syll_per_word"
+Trollope,Phineas (1869),Angel (1881),23,3,5,2,0.65,0.10728402032749859,0.3333333333333333,"avg_word_len, pct_monosyllabic",subordination_rate,"comma_rate, fw_it, syll_per_word"
+Braddon,Quest (1871),Phantom (1883),23,4,2,1,0.35,0.3241106719367589,0.2,subordination_rate,"avg_word_len, fw_it, pct_monosyllabic",ttr
+Burnett,Princess (1905),Garden (1911),23,4,3,1,0.52,0.4528514963297572,0.16666666666666666,fw_was,"fw_but, syll_per_word, ttr","question_rate, semicolon_rate"
+Thackeray,Esmond (1852),Virginians (1859),24,3,5,1,0.62,0.5212450592885376,0.14285714285714285,fw_of,"exclaim_rate, fw_it","fw_in, fw_the, sent_len_mean, ttr"
+Blackmore,Erema (1877),Springhaven (1887),23,1,4,1,0.17,0.17391304347826086,0.25,sent_len_std,,"exclaim_rate, fw_of, question_rate"
+Ward,Ashe (1905),Harvest (1920),24,1,5,1,0.21,0.20833333333333334,0.2,semicolon_rate,,"avg_word_len, fw_to, pct_monosyllabic, syll_per_word"
+Hardy,Tess (1891),Jude (1895),24,4,0,0,0.0,1.0,0.0,,"coordination_rate, fw_and, fw_in, fw_to",
+James,Tragic (1890),Ambassadors (1903),24,4,0,0,0.0,1.0,0.0,,"avg_word_len, exclaim_rate, pct_monosyllabic, syll_per_word",
+Dickens,Bleak (1853),Expectations (1861),24,3,1,0,0.12,1.0,0.0,,"coordination_rate, fw_and, syll_per_word",fw_to
+Lee,Brown (1884),Penelope (1903),24,3,5,0,0.62,1.0,0.0,,"comma_rate, exclaim_rate, fw_as","dash_rate, fw_but, fw_in, fw_of, sent_len_mean"
+Meredith,Richmond (1871),Marriage (1895),23,3,1,0,0.13,1.0,0.0,,"avg_word_len, pct_monosyllabic, question_rate",fw_it
+Wcollins,Woman (1860),Legacy (1889),24,3,3,0,0.38,1.0,0.0,,"fw_of, semicolon_rate, ttr","avg_word_len, pct_monosyllabic, syll_per_word"
+Bennet,Helen (1910),Imperial (1930),24,2,1,0,0.08,1.0,0.0,,"comma_rate, fw_the",subordination_rate
+Conrad,Nostromo (1904),Rover (1923),24,2,0,0,0.0,1.0,0.0,,"comma_rate, fw_in",
+Ford,Soldier (1915),Post (1926),24,2,0,0,0.0,1.0,0.0,,"exclaim_rate, pct_monosyllabic",
+Gissing,Women (1893),Warburton (1903),23,2,1,0,0.09,1.0,0.0,,"exclaim_rate, semicolon_rate",fw_that
+Lawrence,Women (1920),Serpent (1926),23,2,1,0,0.09,1.0,0.0,,"fw_that, subordination_rate",exclaim_rate
+Corelli,Satan (1895),Innocent (1914),24,1,5,0,0.21,1.0,0.0,,question_rate,"avg_word_len, fw_of, fw_that, pct_monosyllabic, subordination_rate"
+Galsworthy,Saints (1919),River (1933),24,1,1,0,0.04,1.0,0.0,,fw_to,fw_of
+Gaskell,Lovers (1863),Wives (1865),23,1,2,0,0.09,1.0,0.0,,comma_rate,"fw_in, fw_was"
+Morris,Wood (1894),Water (1897),24,1,0,0,0.0,1.0,0.0,,fw_of,
+Barclay,Postern (1911),Ladies (1917),23,0,1,0,0.0,1.0,0.0,,,comma_rate
+Cbronte,Shirley (1849),Villette (1853),24,0,0,0,0.0,1.0,,,,
+Chesterton,Thursday (1908),Innocence (1911),24,0,2,0,0.0,1.0,0.0,,,"fw_of, syll_per_word"
+Doyle,Hound (1902),Lost (1912),24,0,0,0,0.0,1.0,,,,
+Eliot,Felix (1866),Daniel (1876),24,0,2,0,0.0,1.0,0.0,,,"exclaim_rate, question_rate"
+Forster,View (1908),Howards (1910),24,0,1,0,0.0,1.0,0.0,,,fw_of
+Haggard,She (1887),Sheallan (1921),24,0,2,0,0.0,1.0,0.0,,,"dash_rate, fw_as"
+Kipling,Captains (1896),Kim (1901),24,0,0,0,0.0,1.0,,,,
+Lytton,What (1858),Kenelm (1873),24,0,1,0,0.0,1.0,0.0,,,semicolon_rate
+Schreiner,Trooper (1897),Undine (1929),23,0,0,0,0.0,1.0,,,,
+Stevenson,Arrow (1888),Catriona (1893),23,0,3,0,0.0,1.0,0.0,,,"exclaim_rate, fw_and, fw_it"

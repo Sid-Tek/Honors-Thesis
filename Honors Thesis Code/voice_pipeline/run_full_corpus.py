@@ -45,7 +45,14 @@ import matplotlib.pyplot as plt
 from windowing import load_text, parse_sentences, local_windows
 from features import extract_features, extract_features_cumulative, FEATURE_NAMES
 from scoring import corpus_stats, author_profile, distinctiveness_scores
-from stats_tests import burst_test, accumulator_test, bh_fdr, DEFAULT_NULL, CHUNK_SIZE
+from stats_tests import burst_test, accumulator_test, bh_fdr, opening_rank_p, DEFAULT_NULL, CHUNK_SIZE
+
+# Author-level burst: the opening (same length burst_test uses) ranks in the
+# top 1% of every same-length stretch in that book (stats_tests.opening_rank_p).
+# Not a study-wide test -- ~1% of curves hit this by chance (~8 of ~780) --
+# but it shows the per-author bursts that the chunk-shuffle burst test can no
+# longer certify study-wide (see stats_tests.py docstring).
+AUTHOR_BURST_P = 0.01
 
 NULL_DESC = (f'chunk shuffle ({CHUNK_SIZE}-window pieces kept intact)' if DEFAULT_NULL == 'chunk'
              else 'single-window shuffle')
@@ -144,11 +151,13 @@ def main():
             ])
             bt = burst_test(curve)
             at = accumulator_test(curve)
+            rank_p = opening_rank_p(curve)
             rows.append({
                 'author': author, 'feature': feat, 'n_test_books': n_books,
                 'n_windows': min_len,
                 'burst_stat': bt['stat'], 'burst_p': bt['p_value'],
                 'accum_slope': at['slope'], 'accum_p': at['p_value'],
+                'opening_rank_p': rank_p,
             })
 
         print(f"  [{i+1}/{len(subjects)}] {author}: {n_books} test book(s), "
@@ -172,6 +181,10 @@ def main():
         return 'null'
 
     df['verdict'] = df.apply(call, axis=1)
+    df['author_level_burst'] = df['opening_rank_p'] <= AUTHOR_BURST_P
+    n_rank_tests = int(df['opening_rank_p'].notna().sum())
+    n_author_bursts = int(df['author_level_burst'].sum())
+    n_chance = AUTHOR_BURST_P * n_rank_tests
     df.to_csv(os.path.join(OUT_DIR, 'author_feature_results.csv'), index=False)
 
     # ---- Aggregate across authors, per feature ----
@@ -198,6 +211,7 @@ def main():
             'n_authors_accumulator': n_accum,
             'n_authors_both': n_both,
             'n_authors_null': n_null,
+            'n_authors_opening_top1pct': int(sub['author_level_burst'].sum()),
             'pct_burst': n_burst / n_subjects * 100,
             'pct_accumulator': n_accum / n_subjects * 100,
             'pct_any_signal': (n_burst + n_accum + n_both) / n_subjects * 100,
@@ -211,10 +225,19 @@ def main():
     # ---- Plot 1: every (author, feature) point, colored by verdict ----
     verdict_colors = {'burst': '#a53b3b', 'accumulator': '#3b6ea5', 'both': '#8b3ba5', 'null': '#bbbbbb'}
     fig, ax = plt.subplots(figsize=(8, 6.5))
+    verdict_labels = {'burst': 'burst, study-wide', 'accumulator': 'accumulator, study-wide',
+                      'both': 'both, study-wide', 'null': 'no study-wide pattern'}
     for verdict, color in verdict_colors.items():
         sub = df[df['verdict'] == verdict]
+        if len(sub) == 0:
+            continue
         ax.scatter(sub['burst_stat'], sub['accum_slope'], color=color, s=18, alpha=0.65,
-                   label=f'{verdict} (n={len(sub)})')
+                   label=f'{verdict_labels[verdict]} (n={len(sub)})')
+    ab = df[df['author_level_burst']]
+    ax.scatter(ab['burst_stat'], ab['accum_slope'], s=80, facecolor='none',
+               edgecolor=verdict_colors['burst'], linewidth=1.4,
+               label=(f'author-level burst: opening in top 1% of its own book\n'
+                      f'(n={n_author_bursts}; ~{n_chance:.0f} expected by chance)'))
     ax.axhline(0, color='gray', linewidth=0.7, linestyle='--')
     ax.axvline(0, color='gray', linewidth=0.7, linestyle='--')
     ax.set_xlabel('burst effect (opening minus rest)')
@@ -237,7 +260,7 @@ def main():
         size = 40 + 6 * (r['n_authors_burst'] + r['n_authors_accumulator'] + r['n_authors_both'])
         ax.scatter(r['mean_burst_effect'], r['mean_accum_slope'], color=color, s=size,
                    edgecolor='white', linewidth=0.6)
-        label = f"{r['feature']} ({r['n_authors_burst']}b/{r['n_authors_accumulator']}a/{n_subjects})"
+        label = f"{r['feature']} ({r['n_authors_opening_top1pct']}b*/{r['n_authors_accumulator']}a/{n_subjects})"
         ax.annotate(label, (r['mean_burst_effect'], r['mean_accum_slope']),
                     fontsize=7, xytext=(5, 4), textcoords='offset points')
     ax.axhline(0, color='gray', linewidth=0.7, linestyle='--')
@@ -245,8 +268,9 @@ def main():
     ax.set_xlabel('mean burst effect across authors')
     ax.set_ylabel('mean accumulator slope across authors')
     ax.set_title(f'Feature battery, averaged across {n_subjects} authors\n'
-                 f'(label = feature (#authors burst / #authors accumulator / {n_subjects} total); '
-                 f'point size = how many authors showed any significant pattern)')
+                 f'(label = feature (b* = #authors whose opening is in the top 1% of their book / '
+                 f'a = #authors study-wide accumulator / {n_subjects} total);\n'
+                 f'point size = how many authors showed any study-wide significant pattern)', fontsize=10)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT_DIR, 'plots', 'master_scatter_by_feature.png'), dpi=130, bbox_inches='tight')
     plt.close(fig)
@@ -264,6 +288,11 @@ def main():
                 f"{NULL_DESC}. BH-FDR is study-wide, applied separately to the burst and "
                 f"accumulator families ({n_subjects} authors x {len(FEATURE_NAMES)} features each), "
                 "not per-author.\n\n")
+        f.write(f"Author-level bursts: {n_author_bursts} of {n_rank_tests} author x feature openings rank "
+                f"in the top 1% of every same-length stretch of their own book (~{n_chance:.0f} expected by "
+                "chance). These are per-author observations, not study-wide significant results: under "
+                "the chunk-shuffle null no single author x feature burst can clear study-wide FDR "
+                "(column n_authors_opening_top1pct).\n\n")
         if excluded:
             f.write(f"Excluded as subjects (only 1 book available): {excluded}\n\n")
         f.write(agg_df.to_markdown(index=False))

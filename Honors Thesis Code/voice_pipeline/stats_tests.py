@@ -134,6 +134,28 @@ def accumulator_test(local_scores, n_perm: int = N_PERM, seed: int = 0, null: st
     return {'slope': observed, 'p_value': float(p), 'n_windows': n}
 
 
+def opening_rank_p(local_scores, n_burst_windows: int = 2):
+    """Author-level burst check: of every n_burst_windows-long stretch in the
+    book (every start position), what share is at least as distinctive as the
+    opening? Computed on the linearly detrended curve, so a rising or falling
+    trend doesn't push the opening up or down. p = 1/(number of stretches)
+    means the opening is THE most distinctive stretch in the book.
+
+    Needs no independence assumption (so it is autocorrelation-safe), but its
+    floor is ~1/n, so it answers "is this opening unusual for THIS book?" --
+    not a study-wide significance test. Under no opening effect, about 1% of
+    curves land at p <= 0.01 by chance (placebo check: null_checks.py)."""
+    scores = np.asarray(local_scores, dtype=float)
+    n, k = len(scores), n_burst_windows
+    if n < 4 * k or np.isnan(scores).any():
+        return np.nan
+    x = np.arange(n, dtype=float)
+    resid = scores - np.polyval(np.polyfit(x, scores, 1), x)
+    c = np.concatenate([[0.0], np.cumsum(resid)])
+    means = (c[k:] - c[:-k]) / k
+    return float(np.mean(means >= means[0] - TIE_TOL))
+
+
 def bh_fdr(pvalues):
     """Benjamini-Hochberg FDR correction. Returns adjusted p-values in the
     same order as the input (NaNs pass through as NaN)."""

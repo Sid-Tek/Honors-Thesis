@@ -112,6 +112,7 @@ def _book_matrix(args):
 def load_window_features(rebuild=False):
     if not rebuild and os.path.exists(CACHE):
         z = np.load(CACHE, allow_pickle=True)
+        print(f'Loading cached window features from {CACHE}', flush=True)
         return z['mats'].item(), pd.read_csv(os.path.join(OUT, 'front_matter_cuts.csv'))
     by_author = discover_authors()
     books = [fn for a, bs in by_author.items() if len(bs) >= 2 for _, fn in bs]
@@ -403,6 +404,7 @@ def main():
     authors, A = author_profiles(mats, trimmed=True)
     _, U = author_profiles(mats, trimmed=False)
 
+    print('  author profiles built; testing trimmed and untrimmed openings...', flush=True)
     tests = register_tests(A, rng)
     ut = register_tests(U, rng)
     for c in ('mean_z_1500', 'p_1500', 'q_1500'):
@@ -414,7 +416,9 @@ def main():
 
     sig = tests[tests['q_1500'] < ALPHA]['feature'].tolist()
     ends = []
-    for f in sig:
+    print(f'  {len(sig)} of 24 features shift in the first 1,500 words (q < {ALPHA}): {", ".join(sig) or "none"}', flush=True)
+    for n_f, f in enumerate(sig, 1):
+        print(f'  end point {n_f}/{len(sig)}: {f} ({N_BOOT} bootstrap draws x 2 shapes)', flush=True)
         j = FEATURE_NAMES.index(f)
         E, lo, hi, a, _ = end_point(A[:, :, j], rng, 'fade')
         Es, *_ = end_point(A[:, :, j], rng, 'step')
@@ -437,6 +441,7 @@ def main():
     if len(ends):
         plot_ends(ends, os.path.join(OUT, 'plots', 'register_ends.png'))
     write_report(tests, ends, cuts, plc, os.path.join(OUT, 'opening_register_report.md'))
+    print(f'Outputs written to {OUT}/ (report: opening_register_report.md)', flush=True)
     pd.set_option('display.width', 220)
     print(tests[['feature', 'mean_z_600', 'q_600', 'mean_z_1500', 'n_authors_same_sign', 'q_1500',
                  'mean_z_3000', 'q_3000', 'u_mean_z_1500', 'u_q_1500']].sort_values('q_1500').to_string(index=False))

@@ -1,0 +1,4 @@
+quantity,estimate_words,ci_lo,ci_hi,share_of_draws_gap_above_0,n_valid_draws
+register end (combined),2775.0,825.0,5700.0,,2000
+voice onset (corrected),5700.0,900.0,14100.0,,2000
+gap = onset - register end,2925.0,-3075.0,12001.874999999989,0.707,2000

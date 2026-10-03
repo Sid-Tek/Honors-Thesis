@@ -1,0 +1,3 @@
+version,onset_words,ci_lo,ci_hi,n_authors
+raw,0.0,0.0,6900.0,23
+corrected,5700.0,900.0,12900.0,23

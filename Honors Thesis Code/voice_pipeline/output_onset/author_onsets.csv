@@ -1,0 +1,24 @@
+author,n_features,features,n_windows,onset_words_raw,ci_lo_raw,ci_hi_raw,onset_words_corrected,ci_lo_corrected,ci_hi_corrected,verdict
+Blackmore,1,ttr,527,0.0,0.0,78900.0,0.0,0.0,78900.0,can't tell
+Braddon,2,fw_as semicolon_rate,552,10800.0,0.0,75907.49999999996,10200.0,0.0,77107.49999999996,can't tell
+Cbronte,5,comma_rate dash_rate fw_in fw_it question_rate,612,23400.0,0.0,75600.0,27000.0,0.0,81600.0,can't tell
+Conrad,3,dash_rate sent_len_mean sent_len_std,280,29100.0,592.5000000000005,42000.0,29400.0,300.0,42000.0,can't tell
+Corelli,2,dash_rate fw_as,399,0.0,0.0,54007.499999999956,0.0,0.0,55500.0,can't tell
+Doyle,4,comma_rate fw_the pct_monosyllabic syll_per_word,190,0.0,0.0,27007.49999999996,2400.0,0.0,26107.49999999996,can't tell
+Eliot,3,comma_rate fw_and semicolon_rate,563,8400.0,0.0,84300.0,15000.0,0.0,84300.0,can't tell
+Ford,3,fw_the fw_to fw_was,224,0.0,0.0,33600.0,0.0,0.0,33600.0,can't tell
+Forster,1,fw_of,217,14400.0,0.0,32400.0,15000.0,0.0,32400.0,can't tell
+Galsworthy,1,fw_that,293,18900.0,0.0,43800.0,19800.0,0.0,43800.0,can't tell
+Gaskell,1,fw_it,602,5400.0,0.0,81907.49999999996,79200.0,6600.0,90300.0,after the opening
+Gissing,1,sent_len_mean,273,4800.0,0.0,40800.0,35100.0,0.0,40800.0,can't tell
+Haggard,4,coordination_rate exclaim_rate fw_to syll_per_word,347,3600.0,0.0,48307.499999999956,3600.0,0.0,48907.499999999956,can't tell
+Hardy,3,dash_rate sent_len_mean sent_len_std,465,32700.0,0.0,69600.0,34200.0,0.0,69600.0,can't tell
+James,4,fw_it fw_that hapax_rate ttr,494,0.0,0.0,74100.0,0.0,0.0,74100.0,can't tell
+Kipling,1,subordination_rate,170,11100.0,0.0,25500.0,11400.0,0.0,25500.0,can't tell
+Lawrence,5,avg_word_len hapax_rate pct_monosyllabic syll_per_word ttr,569,0.0,0.0,85200.0,0.0,0.0,84900.0,can't tell
+Lytton,3,fw_and fw_that fw_to,598,37800.0,0.0,84014.99999999991,43200.0,0.0,88800.0,can't tell
+Meredith,11,avg_word_len comma_rate coordination_rate fw_and hapax_rate pct_monosyllabic question_rate sent_len_mean sent_len_std subordination_rate syll_per_word,501,1500.0,0.0,46807.499999999956,1500.0,0.0,45300.0,can't tell
+Stevenson,3,coordination_rate exclaim_rate fw_it,254,5100.0,0.0,37200.0,4200.0,0.0,35400.0,can't tell
+Trollope,5,fw_and fw_as fw_that question_rate sent_len_mean,701,40200.0,0.0,101100.0,40200.0,0.0,102900.0,can't tell
+Wcollins,1,subordination_rate,386,10500.0,0.0,57900.0,12600.0,0.0,57900.0,can't tell
+Woolf,2,sent_len_mean sent_len_std,219,0.0,0.0,32700.0,0.0,0.0,32700.0,can't tell

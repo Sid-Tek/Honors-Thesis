@@ -117,8 +117,13 @@ def load_window_features(rebuild=False):
     books = [fn for a, bs in by_author.items() if len(bs) >= 2 for _, fn in bs]
     jobs = [(fn, t) for fn in books for t in (True, False)]
     mats, cuts = {}, []
+    t0 = time.time()
+    print(f'Extracting window features: {len(books)} books x (trimmed, untrimmed) = {len(jobs)} jobs '
+          f'(one-time; cached afterwards)...', flush=True)
     with ProcessPoolExecutor() as ex:
-        for fn, trimmed, m, start, method in ex.map(_book_matrix, jobs):
+        for i, (fn, trimmed, m, start, method) in enumerate(ex.map(_book_matrix, jobs), 1):
+            print(f'  [{i}/{len(jobs)}] {fn} ({"trimmed" if trimmed else "untrimmed"}, '
+                  f'{len(m)} windows) {time.time()-t0:.0f}s', flush=True)
             mats[(fn, trimmed)] = m
             if trimmed:
                 with open(os.path.join(CORPUS_DIR, fn), encoding='utf-8', errors='ignore') as f:
@@ -259,6 +264,8 @@ def placebo(mats, rng):
                 vals.append(z[s:s + k].mean(axis=0))
             V[i] = np.nanmean(vals, axis=0)
         p = np.array([signflip_p(V[:, j], rng, 5000) for j in range(V.shape[1])])
+        if (d + 1) % 10 == 0:
+            print(f'  placebo draw {d + 1}/{N_PLACEBO}', flush=True)
         rows.append({'draw': d, 'n_p_below_05': int(np.sum(p < ALPHA)),
                      'n_q_below_05': int(np.sum(bh(p) < ALPHA))})
     return pd.DataFrame(rows)
@@ -391,7 +398,7 @@ def main():
     os.makedirs(os.path.join(OUT, 'plots'), exist_ok=True)
     rng = np.random.default_rng(SEED)
     mats, cuts = load_window_features()
-    print(f'features ready ({time.time()-t0:.0f}s)')
+    print(f'Features ready ({time.time()-t0:.0f}s). Running register tests and end-point bootstraps...', flush=True)
 
     authors, A = author_profiles(mats, trimmed=True)
     _, U = author_profiles(mats, trimmed=False)
@@ -416,11 +423,11 @@ def main():
                      'mean_z_1500': tests.set_index('feature').loc[f, 'mean_z_1500']})
     ends = pd.DataFrame(ends).set_index('feature') if ends else pd.DataFrame(
         columns=['end_words', 'ci_lo', 'ci_hi', 'start_height_z', 'step_end_words', 'mean_z_1500'])
-    print(f'tests + end points done ({time.time()-t0:.0f}s)')
+    print(f'Tests + end points done ({time.time()-t0:.0f}s). Building profiles and running placebo ({N_PLACEBO} draws)...', flush=True)
 
     prof = pd.concat([profile_table(A, 'trimmed', rng), profile_table(U, 'untrimmed', rng)])
     plc = placebo(mats, rng)
-    print(f'placebo done ({time.time()-t0:.0f}s)')
+    print(f'Placebo done ({time.time()-t0:.0f}s). Writing outputs...', flush=True)
 
     tests.to_csv(os.path.join(OUT, 'register_tests.csv'), index=False)
     ends.to_csv(os.path.join(OUT, 'register_boundaries.csv'))

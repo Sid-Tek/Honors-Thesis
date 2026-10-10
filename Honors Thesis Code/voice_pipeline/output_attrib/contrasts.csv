@@ -1,0 +1,57 @@
+method,measure,contrast,label,diff,ci_lo,ci_hi,verdict
+delta,accuracy,P1  opening is harder than the middle (all training),P1  opening is harder than the middle (all training),0.10035842293906805,0.0035842293906809264,0.2043010752688172,higher
+delta,accuracy,P2  accuracy keeps rising after the register: later vs early (all training),P2  accuracy keeps rising after the register: later vs early (all training),0.02508960573476693,-0.05197132616487454,0.09976105137395458,inconclusive
+delta,accuracy,middle vs early (all training),    middle vs early (all training),0.0035842293906809264,-0.07168458781362008,0.0771057347670249,inconclusive
+delta,accuracy,later vs middle (all training),    later vs middle (all training),0.021505376344086002,-0.04062126642771802,0.08602150537634412,inconclusive
+delta,accuracy,P3  dropping openings from training helps: all positions,P3  dropping openings from training helps: all positions,-0.0007168458781362519,-0.007168458781361964,0.006451612903225823,inconclusive
+delta,accuracy,... for the opening passage,    ... for the opening passage,-0.010752688172043057,-0.03225806451612906,0.0,inconclusive
+delta,accuracy,... for later passages,    ... for later passages,-0.004778972520907976,-0.01194743130227005,0.0035842293906809264,inconclusive
+delta,accuracy,P4  position-matched training beats equal-size unmatched: opening,P4  position-matched training beats equal-size unmatched: opening,0.05376344086021506,-0.05376344086021506,0.16129032258064513,inconclusive
+delta,accuracy,... early,    ... early,-0.09677419354838707,-0.17741935483870963,-0.021505376344086002,lower
+delta,accuracy,... middle,    ... middle,-0.01792114695340502,-0.0896057347670251,0.05376344086021506,inconclusive
+delta,accuracy,... later,    ... later,-0.03823178016726403,-0.08246714456391875,0.001194743130226994,inconclusive
+delta,accuracy,P5  rise after the register without the register words: later vs early,P5  rise after the register without the register words: later vs early,0.02389486260453999,-0.05137395459976102,0.09977598566308239,inconclusive
+delta,accuracy,removing the register words changes opening accuracy by,    removing the register words changes opening accuracy by,0.0,0.0,0.0,inconclusive
+delta,accuracy,removing the register words changes later accuracy by,    removing the register words changes later accuracy by,-0.0011947431302269385,-0.01194743130227005,0.009557945041815952,inconclusive
+delta,mean reciprocal rank,P1  opening is harder than the middle (all training),P1  opening is harder than the middle (all training),0.09506754569236553,0.011351468177315627,0.1777136878141814,higher
+delta,mean reciprocal rank,P2  accuracy keeps rising after the register: later vs early (all training),P2  accuracy keeps rising after the register: later vs early (all training),0.016678560785807983,-0.0385883924492814,0.06879696092800892,inconclusive
+delta,mean reciprocal rank,middle vs early (all training),    middle vs early (all training),0.0022216444256992762,-0.05484994756926863,0.05577931650210335,inconclusive
+delta,mean reciprocal rank,later vs middle (all training),    later vs middle (all training),0.014456916360108707,-0.03288611739650179,0.062087969783019545,inconclusive
+delta,mean reciprocal rank,P3  dropping openings from training helps: all positions,P3  dropping openings from training helps: all positions,-0.0013761793380048237,-0.004698475218956602,0.002416264760842462,inconclusive
+delta,mean reciprocal rank,... for the opening passage,    ... for the opening passage,-0.009049831677915066,-0.02282745142446277,0.0006771305158402038,inconclusive
+delta,mean reciprocal rank,... for later passages,    ... for later passages,-0.0029589537643754937,-0.00713723175304706,0.001732129163714704,inconclusive
+delta,mean reciprocal rank,P4  position-matched training beats equal-size unmatched: opening,P4  position-matched training beats equal-size unmatched: opening,0.053741636072851984,-0.02350988999216384,0.1339261408431091,inconclusive
+delta,mean reciprocal rank,... early,    ... early,-0.06115548166935525,-0.12479048906622345,0.0006682024913397762,inconclusive
+delta,mean reciprocal rank,... middle,    ... middle,-0.025052707138770558,-0.07669552449159212,0.024279617265482938,inconclusive
+delta,mean reciprocal rank,... later,    ... later,-0.043448086908323136,-0.07291673771419982,-0.01467289796389205,lower
+delta,mean reciprocal rank,P5  rise after the register without the register words: later vs early,P5  rise after the register without the register words: later vs early,0.013474181410083053,-0.04378165618905308,0.06896851542719312,inconclusive
+delta,mean reciprocal rank,removing the register words changes opening accuracy by,    removing the register words changes opening accuracy by,-0.0029189746931682636,-0.008910281773185027,0.0018003576471318278,inconclusive
+delta,mean reciprocal rank,removing the register words changes later accuracy by,    removing the register words changes later accuracy by,-0.0013137100720674866,-0.007726610148252278,0.005303479443142404,inconclusive
+cosine,accuracy,P1  opening is harder than the middle (all training),P1  opening is harder than the middle (all training),0.16129032258064518,0.05734767025089604,0.2652329749103942,higher
+cosine,accuracy,P2  accuracy keeps rising after the register: later vs early (all training),P2  accuracy keeps rising after the register: later vs early (all training),0.031063321385902065,-0.04480286738351247,0.10454002389486261,inconclusive
+cosine,accuracy,middle vs early (all training),    middle vs early (all training),0.021505376344086002,-0.05734767025089604,0.10215053763440862,inconclusive
+cosine,accuracy,later vs middle (all training),    later vs middle (all training),0.009557945041816063,-0.05017921146953397,0.07290919952210265,inconclusive
+cosine,accuracy,P3  dropping openings from training helps: all positions,P3  dropping openings from training helps: all positions,-0.0007168458781361409,-0.007168458781361964,0.006451612903225823,inconclusive
+cosine,accuracy,... for the opening passage,    ... for the opening passage,-0.010752688172043001,-0.03225806451612906,0.0,inconclusive
+cosine,accuracy,... for later passages,    ... for later passages,0.0,-0.008363201911589013,0.010752688172043001,inconclusive
+cosine,accuracy,P4  position-matched training beats equal-size unmatched: opening,P4  position-matched training beats equal-size unmatched: opening,0.12903225806451613,0.03225806451612906,0.2258064516129032,higher
+cosine,accuracy,... early,    ... early,-0.05913978494623656,-0.12903225806451613,0.016129032258064502,inconclusive
+cosine,accuracy,... middle,    ... middle,0.003584229390680982,-0.053763440860215006,0.05743727598566263,inconclusive
+cosine,accuracy,... later,    ... later,-0.038231780167264084,-0.08127240143369181,0.005973715651135025,inconclusive
+cosine,accuracy,P5  rise after the register without the register words: later vs early,P5  rise after the register without the register words: later vs early,0.020908004778972478,-0.05316606929510159,0.09499701314217442,inconclusive
+cosine,accuracy,removing the register words changes opening accuracy by,    removing the register words changes opening accuracy by,0.0,-0.032258064516129004,0.032258064516129004,inconclusive
+cosine,accuracy,removing the register words changes later accuracy by,    removing the register words changes later accuracy by,-0.004778972520908087,-0.014336917562723928,0.004778972520908087,inconclusive
+cosine,mean reciprocal rank,P1  opening is harder than the middle (all training),P1  opening is harder than the middle (all training),0.11560488248188683,0.04405338937169007,0.19097129404765925,higher
+cosine,mean reciprocal rank,P2  accuracy keeps rising after the register: later vs early (all training),P2  accuracy keeps rising after the register: later vs early (all training),0.025714968870020227,-0.03192836582041055,0.08158792491649165,inconclusive
+cosine,mean reciprocal rank,middle vs early (all training),    middle vs early (all training),0.010631631891064197,-0.049628333315255506,0.07006762521270386,inconclusive
+cosine,mean reciprocal rank,later vs middle (all training),    later vs middle (all training),0.01508333697895603,-0.030300324259948185,0.06206870594703493,inconclusive
+cosine,mean reciprocal rank,P3  dropping openings from training helps: all positions,P3  dropping openings from training helps: all positions,-0.00025921652180838084,-0.004107422939425676,0.0038725775901545714,inconclusive
+cosine,mean reciprocal rank,... for the opening passage,    ... for the opening passage,-0.004691037755553795,-0.017945205654246434,0.004398445789574816,inconclusive
+cosine,mean reciprocal rank,... for later passages,    ... for later passages,0.0003074230725504945,-0.004788312765657626,0.006424339058827239,inconclusive
+cosine,mean reciprocal rank,P4  position-matched training beats equal-size unmatched: opening,P4  position-matched training beats equal-size unmatched: opening,0.09330236930247848,0.019340448018015384,0.17728427845742414,higher
+cosine,mean reciprocal rank,... early,    ... early,-0.04397172648500269,-0.09859131887541833,0.011921380763370484,inconclusive
+cosine,mean reciprocal rank,... middle,    ... middle,-0.022243975339979682,-0.06619256632304657,0.021046204780140923,inconclusive
+cosine,mean reciprocal rank,... later,    ... later,-0.03837842254476509,-0.07169759505371977,-0.0066413556148749745,lower
+cosine,mean reciprocal rank,P5  rise after the register without the register words: later vs early,P5  rise after the register without the register words: later vs early,0.02215465715621079,-0.035339782037387794,0.07758419156970657,inconclusive
+cosine,mean reciprocal rank,removing the register words changes opening accuracy by,    removing the register words changes opening accuracy by,0.002952853598014782,-0.013623055260152128,0.019145919492693685,inconclusive
+cosine,mean reciprocal rank,removing the register words changes later accuracy by,    removing the register words changes later accuracy by,-0.0006490577944908704,-0.006017885279033358,0.0049500725900780305,inconclusive

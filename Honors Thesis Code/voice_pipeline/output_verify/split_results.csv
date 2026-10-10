@@ -1,0 +1,9 @@
+group,variant,onset_words,ci_lo,ci_hi,onset_raw_words,n_authors,n_features,n_accumulators,rise_sd,in_3k_8k,note
+split-half,"select on last 50%, estimate on first 50% (clean)",0.0,0.0,18000.0,0.0,4,5,5.0,0.177186538614038,False,curve length 100 windows
+split-half,"whole-book selection, estimate on first 50% (circular, for comparison)",5700.0,300.0,14100.0,0.0,23,69,69.0,0.17877030694987348,True,curve length 100 windows
+split-book,"select on test book 1, estimate on test book 2 (clean)",0.0,0.0,18000.0,0.0,25,77,77.0,0.12683370753985257,False,
+split-book,"whole-book selection, estimate on test book 2 (circular, for comparison)",6900.0,0.0,14100.0,900.0,23,69,69.0,0.0782254478007719,True,
+split-book,"select on test book 2, estimate on test book 1 (clean)",300.0,0.0,16800.0,300.0,26,72,72.0,0.035576933074816505,False,
+split-book,"whole-book selection, estimate on test book 1 (circular, for comparison)",4800.0,0.0,18000.0,0.0,23,69,69.0,0.14551454392020444,True,
+split-book,both directions pooled (clean),0.0,0.0,16800.0,0.0,29,149,,0.06504456430490307,False,149 accumulator picks across the two directions
+split-book,"both directions pooled (circular, for comparison)",5100.0,0.0,15000.0,0.0,23,138,69.0,0.11186999586048813,True,

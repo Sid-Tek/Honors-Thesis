@@ -16,7 +16,7 @@ This is a generalization test: the new dataset will NOT be late 19th / early 20t
 - Per book and feature, z = (window value - baseline) / SD of the baseline residuals, so z = +1 means "one typical window-to-window SD above what the rest of this book predicts". The opening score is the mean z over the first 5 windows.
 - Author = unit of analysis (average z over the author's books). Sign-flip test across authors.
 - Only the 13 pre-chosen features are tested, with BH-FDR across those 13 (q < 0.05, one-sided in the predicted direction).
-- Dialogue is tested separately (not counted in the 13): words inside quotation marks per window, lower in the opening than in the rest of the book, same test and threshold.
+- Dialogue is tested separately (not counted in the 13): words inside quotation marks per window, lower in the opening than in the rest of the book. Measured as the difference in share points between the opening and the same baseline line (not a z-score; see Clarifications), same sign-flip test and threshold (p < 0.05).
 
 ## Predicted directions (frozen)
 
@@ -63,7 +63,8 @@ Source, era, number of authors, number of books, date chosen: TBD.
 ## Clarifications (2026-10-17, made before any new data was touched)
 
 - The first version said the reference was "the rest of the same book". Reading the original code showed it is a straight-line baseline fitted from word 6,000 onward. The spec now says that. A book therefore needs at least 30 windows (about 9,000 words) to have a baseline; the 20,000-word minimum already guarantees this.
-- Dialogue share gets the same z-score treatment as the features.
+- Dialogue share first got the same z-score treatment as the features. That was superseded on 2026-10-17 (see the next item).
+- Dialogue is measured in share points, not z. A dry run on a corpus that is NOT the thesis dataset (the Gutenburg_corpus folder: plays, essays, overlap with the first corpus) showed why: one author's books (Ibsen's plays, 1-3% of words in quotes) have a near-zero baseline SD, so a small difference became z = +10.9 and hid a clear effect in the other 17 authors (mean z -0.37 without him). The dialogue score is now (opening share - baseline line), in share points, which is also the unit of the original 17-point result. The test, the threshold and the verdict rule are unchanged. This change was made before the thesis dataset was chosen or analysed.
 - All frozen settings and predictions now live in config.py.
 
 ## Deviations

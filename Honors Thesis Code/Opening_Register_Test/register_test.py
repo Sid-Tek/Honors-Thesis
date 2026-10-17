@@ -25,8 +25,10 @@ Method (the same as the original opening_register_scan.py)
    PREDICTED direction (exact when there are 16 authors or fewer, otherwise
    20,000 random flips). Benjamini-Hochberg across the 13 tested features.
    A feature PASSES at q < 0.05.
-5. Dialogue (share of words inside quotation marks) gets the same z-score and
-   a one-sided test (lower in the opening), p < 0.05. Books without detectable
+5. Dialogue (share of words inside quotation marks) is measured as the plain
+   difference in share points (opening minus the same baseline line, NOT a
+   z-score: books with almost no dialogue would blow a z up) and gets a
+   one-sided test (lower in the opening), p < 0.05. Books without detectable
    dialogue are left out of this test only.
 6. VERDICT (frozen): CONFIRMED = at least 9 of 13 pass AND dialogue is lower;
    PARTIAL = 5-8 pass, or 9+ pass but dialogue does not; NOT FOUND = 4 or fewer.
@@ -74,6 +76,7 @@ ORIGINAL = {
     'ttr': (-0.21, 22),
 }
 ORIGINAL_N_AUTHORS = 33
+ORIGINAL_DIALOGUE_POINTS = 17      # original corpus: about 17 share points lower (30 of 33 authors)
 
 INK, MUTED, GRID, BLUE = '#333333', '#8a8a8a', '#e6e6e6', '#2a78d6'
 
@@ -87,7 +90,8 @@ def book_matrix(res):
 
 def book_z(M, exclude=None):
     """z of every window against a straight-line baseline fitted from window BASELINE_START onward
-    (or, for the placebo, outside the window range `exclude` = (lo, hi))."""
+    (or, for the placebo, outside the window range `exclude` = (lo, hi)).
+    The dialogue column is the plain difference in share (opening minus baseline), not a z."""
     n = len(M)
     x = np.arange(n)
     use = x >= config.BASELINE_START_WINDOW
@@ -101,6 +105,12 @@ def book_z(M, exclude=None):
             continue
         coef = np.polyfit(x[ok], y[ok], 1)
         r = y - np.polyval(coef, x)
+        if j == DIALOGUE_J:
+            # Dialogue is NOT divided by the baseline SD: a book with almost no dialogue (a play, an essay)
+            # has a near-zero SD and would turn a tiny difference into a huge z. It stays in share
+            # (fraction of words in quotes; 0.10 = 10 share points), as in the original pipeline.
+            Z[:, j] = r
+            continue
         sd = r[ok].std(ddof=2)
         if sd > 1e-12:
             Z[:, j] = r / sd
@@ -174,6 +184,11 @@ def signed(v, direction):
     return v if direction == 'higher' else -v
 
 
+def pts(x):
+    """dialogue difference (fraction of words) -> share points"""
+    return 100.0 * x
+
+
 def verdict_from(n_pass, dialogue_pass, dialogue_testable=True):
     if n_pass >= config.CONFIRMED_MIN_PASS and dialogue_pass:
         return 'CONFIRMED'
@@ -194,6 +209,7 @@ def tested_table(authors, A, rng):
         o = ORIGINAL.get(f)
         rows.append({
             'feature': f, 'label': config.LABELS[f], 'predicted': d, 'n_authors': n,
+            'unit': 'share (fraction of words; x100 = points)' if f == 'dialogue' else 'z',
             'mean_z': float(np.nanmean(v)) if n else np.nan, 'ci_lo': lo, 'ci_hi': hi,
             'authors_in_predicted_direction': int(np.sum(sv[ok] > 0)),
             'p_one_sided': signflip_p(sv, 'greater', rng),
@@ -270,12 +286,13 @@ def plot_effects(tt, path, n_authors):
     """Effect in the PREDICTED direction (positive = as predicted): new corpus vs original corpus."""
     rows = list(tt.itertuples())
     feats = [r for r in rows if r.feature != 'dialogue']
-    dlg = [r for r in rows if r.feature == 'dialogue']
-    order = sorted(feats, key=lambda r: -(r.mean_z if r.predicted == 'higher' else -r.mean_z)) + dlg
-    fig, ax = plt.subplots(figsize=(8.4, 0.42 * len(order) + 1.6))
+    dlg = [r for r in rows if r.feature == 'dialogue'][0]
+    order = sorted(feats, key=lambda r: -(r.mean_z if r.predicted == 'higher' else -r.mean_z))
+    fig, (ax, ax2) = plt.subplots(2, 1, figsize=(8.4, 0.42 * len(order) + 2.6),
+                                  gridspec_kw={'height_ratios': [len(order), 2.2]})
     ys = []
     for i, r in enumerate(order):
-        y = len(order) - 1 - i - (0.6 if r.feature == 'dialogue' else 0)
+        y = len(order) - 1 - i
         ys.append((y, r.label + ('  ↓' if r.predicted == 'lower' else '  ↑')))
         sgn = 1 if r.predicted == 'higher' else -1
         m, lo, hi = sgn * r.mean_z, sgn * r.ci_lo, sgn * r.ci_hi
@@ -291,6 +308,19 @@ def plot_effects(tt, path, n_authors):
     ax.set_xlabel('mean z in the first 1,500 words, in the predicted direction (right = as predicted)',
                   fontsize=8.5, color=INK)
     ax.set_title(f'Opening register in the new corpus ({n_authors} authors)', loc='left', fontsize=10, color=INK)
+
+    # dialogue: own panel, in share points (lower in the opening = right = as predicted)
+    m, lo, hi = -pts(dlg.mean_z), -pts(dlg.ci_hi), -pts(dlg.ci_lo)
+    ax2.plot([lo, hi], [0, 0], color=BLUE, lw=1.6, solid_capstyle='round', zorder=2)
+    ax2.scatter([m], [0], s=46, zorder=3, edgecolor=BLUE, linewidth=1.6, facecolor=BLUE if dlg.pass_ else 'white')
+    ax2.scatter([ORIGINAL_DIALOGUE_POINTS], [0], marker='D', s=26, color=INK, zorder=4)
+    ax2.axvline(0, color=MUTED, lw=1, ls='--')
+    ax2.set_yticks([0])
+    ax2.set_yticklabels(['dialogue share  ↓'], fontsize=8.5, color=INK)
+    ax2.set_ylim(-1, 1)
+    ax2.set_xlabel('share points lower in the first 1,500 words than the book\'s own baseline (right = as predicted)',
+                   fontsize=8.5, color=INK)
+    style_axes(ax2)
     handles = [
         plt.Line2D([], [], marker='o', color=BLUE, mfc=BLUE, lw=0, label='passed (q < 0.05)'),
         plt.Line2D([], [], marker='o', color=BLUE, mfc='white', lw=0, label='did not pass'),
@@ -299,7 +329,7 @@ def plot_effects(tt, path, n_authors):
     ax.legend(handles=handles, frameon=False, fontsize=8, loc='lower right')
     style_axes(ax)
     fig.text(0.01, 0.01, 'Bars = 95% interval from resampling authors. Arrow = predicted direction. '
-             'Dialogue has no original z (it was measured in share points).', fontsize=7, color=INK)
+             'Dialogue is in share points, not z (original corpus: about 17 points).', fontsize=7, color=INK)
     fig.tight_layout(rect=(0, 0.03, 1, 1))
     fig.savefig(path, dpi=150)
     plt.close(fig)
@@ -322,7 +352,8 @@ def write_report(path, args, tt, ex, pl, authors, groups, info, verdict, n_pass,
           f'(one-sided, FDR q < {config.ALPHA}). CONFIRMED needs at least {config.CONFIRMED_MIN_PASS}; '
           f'PARTIAL is {config.PARTIAL_MIN_PASS}-{config.CONFIRMED_MIN_PASS - 1}; below that is NOT FOUND.',
           (f'* Dialogue share in the opening is lower: **{"yes" if dlg_pass else "no"}** '
-           f'(mean z {dlg["mean_z"]:+.2f}, {int(dlg["authors_in_predicted_direction"])}/{int(dlg["n_authors"])} '
+           f'(mean {pts(dlg["mean_z"]):+.1f} share points vs the book\'s own baseline, '
+           f'{int(dlg["authors_in_predicted_direction"])}/{int(dlg["n_authors"])} '
            f'authors lower, p = {fmt_p(dlg["p_one_sided"])}).') if dlg_n >= 3 else
           '* Dialogue could not be tested (fewer than 3 authors with detectable dialogue); the verdict cannot be CONFIRMED.',
           '']
@@ -351,9 +382,10 @@ def write_report(path, args, tt, ex, pl, authors, groups, info, verdict, n_pass,
         orig = f'{r.original_mean_z:+.2f}; {int(r.original_authors_same_direction)}/{ORIGINAL_N_AUTHORS}'
         L.append(f'| {r.label} | {r.predicted} | {r.mean_z:+.2f} ({r.ci_lo:+.2f} to {r.ci_hi:+.2f}) | '
                  f'{r.authors_in_predicted_direction}/{r.n_authors} | {fmt_p(r.q)} | {"**yes**" if r.pass_ else "no"} | {orig} |')
-    L += ['', f'**Dialogue share** (predicted lower): mean z {dlg["mean_z"]:+.2f} '
-          f'({dlg["ci_lo"]:+.2f} to {dlg["ci_hi"]:+.2f}), {int(dlg["authors_in_predicted_direction"])}/'
-          f'{int(dlg["n_authors"])} authors lower, p = {fmt_p(dlg["p_one_sided"])}. '
+    L += ['', f'**Dialogue share** (predicted lower), in share points (not z; a z blows up for books with almost '
+          f'no dialogue): mean {pts(dlg["mean_z"]):+.1f} ({pts(dlg["ci_lo"]):+.1f} to {pts(dlg["ci_hi"]):+.1f}), '
+          f'{int(dlg["authors_in_predicted_direction"])}/{int(dlg["n_authors"])} authors lower, '
+          f'p = {fmt_p(dlg["p_one_sided"])}. '
           'In the original corpus dialogue was about 17 share points lower than in words 6,000-12,000.', '',
           '![effects](plots/register_effects.png)', '']
 
@@ -376,7 +408,9 @@ def write_report(path, args, tt, ex, pl, authors, groups, info, verdict, n_pass,
           '* Plain text loses italics, so italic thoughts or dialogue are not counted as dialogue.',
           '* Translated authors mix translator style into author style.',
           '* "Not found" can mean low power, not absence; compare the intervals with the original corpus.',
-          '* Tests use exact sign-flip p-values when there are 16 authors or fewer, so p cannot go below 1/2^n.',
+          f'* Sign-flip p-values are exact when there are {config.EXACT_MAX_AUTHORS} authors or fewer (p cannot go '
+          f'below 1/2^n); with more authors they come from {config.N_PERM:,} random flips (p cannot go below about '
+          f'{1 / (config.N_PERM + 1):.5f}).',
           f'* Settings: {config.WINDOW_SIZE}-word windows, opening = first {config.OPENING_WINDOWS} windows, '
           f'baseline from window {config.BASELINE_START_WINDOW}, seed {config.SEED}.',
           f'* Runtime {elapsed:.0f}s.', '']

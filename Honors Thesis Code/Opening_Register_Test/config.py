@@ -69,3 +69,11 @@ LABELS = {
 }
 
 assert len(TESTED) == 13 and len(EXPLORATORY) == 11
+
+# --------------------------------------------------- statistics (frozen procedure)
+N_PERM = 20000               # random sign flips when an exact test is too large
+EXACT_MAX_AUTHORS = 16       # with this many authors or fewer, ALL 2^n sign flips are enumerated (exact p)
+N_BOOT = 2000                # author resamples for the 95% intervals
+N_PLACEBO = 50               # placebo draws (same test at random mid-book "openings")
+SEED = 20261017
+MIN_AUTHORS_WARN = 10        # fewer authors than this: the report warns that power is low

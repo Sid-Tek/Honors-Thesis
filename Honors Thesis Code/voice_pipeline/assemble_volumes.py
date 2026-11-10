@@ -6,10 +6,16 @@ files in memory (no extraction), sort pages numerically, join them, and save as
 Surname_Title.txt (same style as Gutenburg_corpus).
 
 RAW: front matter, running heads and OCR noise are left as they are. Trimming is the next step.
+Pages are joined with a form-feed (\\f) so page boundaries survive; \\f is ordinary whitespace
+to anything that splits or normalises text (str.split(), re \\s), so word counts are unchanged.
+
+The input CSV may be filtered.csv OR an existing Hathi_corpus\\manifest.csv. If a row has a "file"
+column its file name is reused as-is (so you can rebuild exactly the current texts after dedupe/exclude).
 
 Usage:
     python -I assemble_volumes.py <filtered.csv> <source_folder> [out_dir] [--overwrite]
   e.g. python -I assemble_volumes.py hathi_inventory_out\\filtered.csv "C:\\Users\\sidte\\Downloads\\HathiFlat\\HathiFlat"
+  or   python -I assemble_volumes.py ..\\Hathi_corpus\\manifest.csv "C:\\Users\\sidte\\Downloads\\HathiFlat\\HathiFlat" ..\\Hathi_corpus_paged
 
 out_dir defaults to ..\\Hathi_corpus (a sibling of voice_pipeline, next to Gutenburg_corpus).
 Existing files are skipped (so you can re-run safely) unless --overwrite.
@@ -75,7 +81,7 @@ def main():
     taken, manifest, problems = set(), [], []
     for i, r in enumerate(rows, 1):
         zid = r["zip_id"]
-        fname = make_name(r["author_key"], r["title"], taken, r["imprint_year"], zid)
+        fname = r.get("file") or make_name(r["author_key"], r["title"], taken, r["imprint_year"], zid)
         path = os.path.join(out_dir, fname)
         zp = zips.get(zid)
         if not zp:
@@ -93,7 +99,7 @@ def main():
                     problems.append(f"no page files in {zid}")
                     continue
                 parts = [z.read(x).decode("utf-8", "replace").strip("\r\n") for _n, x in pg]
-            text = "\n".join(parts) + "\n"
+            text = "\f".join(parts) + "\n"
             with open(path, "w", encoding="utf-8", newline="\n") as f:
                 f.write(text)
             pages, text_words = len(pg), len(text.split())

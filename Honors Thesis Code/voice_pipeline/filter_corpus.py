@@ -11,7 +11,7 @@ can eyeball authors born before 1870, whose books may be reprints of older works
 
 Usage:
     python -I filter_corpus.py hathi_inventory_out/metadata.csv [out_dir]
-        [--from 1930] [--to 1969] [--min-books 3]
+        [--from 1930] [--to 1969] [--min-books 3] [--born-from 1870] [--keep-unknown-birth]
 
 Writes out_dir (default: next to metadata.csv):
     filtered.csv       kept volumes
@@ -44,6 +44,8 @@ def main():
     ap.add_argument("--from", dest="y0", type=int, default=1930)
     ap.add_argument("--to", dest="y1", type=int, default=1969)
     ap.add_argument("--min-books", type=int, default=3)
+    ap.add_argument("--born-from", type=int, default=1870)
+    ap.add_argument("--keep-unknown-birth", action="store_true")
     a = ap.parse_args()
     out_dir = a.out_dir or os.path.dirname(os.path.abspath(a.metadata))
     os.makedirs(out_dir, exist_ok=True)
@@ -64,6 +66,17 @@ def main():
     rows = [r for r in rows if author_key(r["author"])]
     stages.append(("author known", rows))
 
+    def ok_birth(r):
+        b = r["author_birth"]
+        if b.isdigit():
+            return int(b) >= a.born_from
+        return a.keep_unknown_birth
+
+    n_unknown = sum(1 for r in rows if not r["author_birth"].isdigit())
+    rows = [r for r in rows if ok_birth(r)]
+    label = f"author born >= {a.born_from}" + (" (unknown kept)" if a.keep_unknown_birth else " (unknown dropped)")
+    stages.append((label, rows))
+
     titles = defaultdict(set)
     for r in rows:
         r["author_key"] = author_key(r["author"])
@@ -79,29 +92,28 @@ def main():
     dist = Counter(min(len(titles[k]), 10) for k in keep_auth)
     print("Distinct titles per kept author:", sorted(dist.items()), "(10 = 10 or more)")
 
-    early = {k for k in keep_auth
-             if any(r["author_key"] == k and r["author_birth"].isdigit() and int(r["author_birth"]) < 1870 for r in kept)}
     unk = {k for k in keep_auth
            if all(not r["author_birth"].isdigit() for r in kept if r["author_key"] == k)}
     multi = sum(1 for r in kept if r.get("volume_desc", "").strip())
-    print(f"Kept authors born before 1870 (check for reprints of older work): {len(early)}")
+    print(f"Volumes with no birth year before the birth filter: {n_unknown}"
+          f"  ({'kept' if a.keep_unknown_birth else 'dropped; use --keep-unknown-birth to keep'})")
     print(f"Kept authors with no birth year in catalog: {len(unk)}")
     print(f"Kept volumes with a volume description (possible multi-volume works): {multi}")
 
     cols = ["zip_id", "author_key", "author", "title", "imprint_year", "author_birth",
-            "volume_desc", "early_author"]
+            "volume_desc"]
     with open(os.path.join(out_dir, "filtered.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(cols)
         for r in sorted(kept, key=lambda r: (r["author_key"], r["imprint_year"])):
             w.writerow([r["zip_id"], r["author_key"], r["author"], r["title"], r["imprint_year"],
-                        r["author_birth"], r["volume_desc"], 1 if r["author_key"] in early else 0])
+                        r["author_birth"], r["volume_desc"]])
     with open(os.path.join(out_dir, "author_counts.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["author_key", "distinct_titles", "volumes", "early_author", "no_birth_year"])
+        w.writerow(["author_key", "distinct_titles", "volumes", "no_birth_year"])
         for k in sorted(keep_auth, key=lambda k: -len(titles[k])):
             w.writerow([k, len(titles[k]), sum(1 for r in kept if r["author_key"] == k),
-                        1 if k in early else 0, 1 if k in unk else 0])
+                        1 if k in unk else 0])
     print(f"\nWrote {out_dir}/filtered.csv and author_counts.csv")
 
 
